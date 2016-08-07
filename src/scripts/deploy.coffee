@@ -102,13 +102,19 @@ module.exports = (robot) ->
 
     deployment = new Deployment(name, ref, task, env, force, hosts)
 
+    roomName = msg.message.user.room
+    if robot.adapterName is "slack"
+      # cf. https://github.com/slackhq/hubot-slack/issues/328
+      room = robot.adapter.client.rtm.dataStore.getChannelGroupOrDMById roomName
+      roomName = room.name
+
     unless deployment.isValidApp()
       msg.reply "#{name}? Never heard of it."
       return
     unless deployment.isValidEnv()
       msg.reply "#{name} doesn't seem to have an #{env} environment."
       return
-    unless deployment.isAllowedRoom(msg.message.user.room)
+    unless deployment.isAllowedRoom(roomName)
       msg.reply "#{name} is not allowed to be deployed from this room."
       return
 
@@ -118,7 +124,7 @@ module.exports = (robot) ->
       deployment.setUserToken(token)
 
     deployment.user   = user.id
-    deployment.room   = msg.message.user.room
+    deployment.room   = roomName
 
     if robot.adapterName is "flowdock"
       deployment.threadId = msg.message.metadata.thread_id
