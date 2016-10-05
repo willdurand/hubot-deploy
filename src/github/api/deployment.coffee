@@ -124,23 +124,23 @@ class Deployment
         bodyMessage = data['message']
 
         if bodyMessage.match(/No successful commit statuses/)
-          message = """
-          I don't see a successful build for #{repository} that covers the latest \"#{ref}\" branch.
+          bodyMessage = """
+          I don't see a successful build for #{repository} that covers the latest `#{ref}` branch.
           """
 
         if bodyMessage.match(/Conflict merging ([-_\.0-9a-z]+)/)
           default_branch = data.message.match(/Conflict merging ([-_\.0-9a-z]+)/)[1]
-          message = """
-          There was a problem merging the #{default_branch} for #{repository} into #{ref}.
+          bodyMessage = """
+          There was a problem merging `#{default_branch}` for #{repository} into `#{ref}`.
           You'll need to merge it manually, or disable auto-merging.
           """
 
-        if bodyMessage.match(/Merged ([-_\.0-9a-z]+) into/)
-          tmpMessage = """
-          Successfully merged the default branch for #{repository} into #{ref}.
-          Normal push notifications should provide feedback.
+        if bodyMessage.match(/Auto-merged ([-_\.0-9a-z]+) into/)
+          default_branch = data.message.match(/merged ([-_\.0-9a-z]+)/)[1]
+          bodyMessage = """
+          I had to merge `#{default_branch}` for #{repository} into `#{ref}` first.
+          Now you should be able to deploy again.
           """
-          console.log tmpMessage
 
         if bodyMessage.match(/Conflict: Commit status checks/)
           errors = data['errors'][0]

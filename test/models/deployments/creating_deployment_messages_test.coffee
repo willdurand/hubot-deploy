@@ -53,7 +53,7 @@ describe "Deployment#post", () ->
       throw err if err
       assert.equal 409, status
       assert.equal "Conflict merging master into topic.", body.message
-      assert.equal "Conflict merging master into topic.", message
+      assert.equal 'There was a problem merging `master` for atmos/hubot-deploy into `topic`.\nYou\'ll need to merge it manually, or disable auto-merging.', message
       done()
 
   it "successfully auto-merges when the requested ref is behind the default branch", (done) ->
@@ -63,7 +63,7 @@ describe "Deployment#post", () ->
       throw err if err
       assert.equal 202, status
       assert.equal "Auto-merged master into topic on deployment.", body.message
-      assert.equal "Auto-merged master into topic on deployment.", message
+      assert.equal 'I had to merge `master` for atmos/hubot-deploy into `topic` first.\nNow you should be able to deploy again.', message
       done()
 
   it "successfully created deployment", (done) ->
